@@ -2079,14 +2079,12 @@ const renderConfiguracoes = () => (
               </div>
 
               <div>
-               <label className="block text-sm mb-2 font-medium">Valor (R$)</label>
-
+              <label className="block text-sm mb-2 font-medium">Valor (R$)</label>
 <input
   value={formRapido.valor}
-  onChange={(e) => {
-    const formatted = formatCurrencyBR(e.target.value);
-    setFormRapido({ ...formRapido, valor: formatted });
-  }}
+  onChange={(e) =>
+    setFormRapido({ ...formRapido, valor: e.target.value })
+  }
   className="w-full bg-gray-700 border-2 border-gray-600 rounded-xl py-4 text-2xl font-bold text-center focus:border-blue-500 focus:outline-none min-h-[60px]"
   placeholder="0,00"
   autoFocus
