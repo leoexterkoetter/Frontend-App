@@ -125,7 +125,8 @@ const CATEGORIAS_PADRAO = {
   receitas: ['Salário', 'Freelance', 'Investimentos', 'Outros']
 };
 
-const FinanceApp = ({ usuario, onLogout }) => {
+const FinanceApp = () => {
+  const { user: usuario, logout: onLogout } = useAuth();
   const [tela, setTela] = useState('dashboard');
   const [modalRapido, setModalRapido] = useState(false);
   const [modalCaixinha, setModalCaixinha] = useState(false);

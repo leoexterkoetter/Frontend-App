@@ -17,7 +17,6 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Carregar usuário do localStorage
     const storedUser = localStorage.getItem('user');
     const storedToken = localStorage.getItem('token');
     
@@ -31,18 +30,15 @@ export const AuthProvider = ({ children }) => {
     try {
       const data = await authApi.login(email, senha);
       
-      setUser({
+      const userData = {
         id: data.id,
         nome: data.nome,
         email: data.email
-      });
+      };
       
+      setUser(userData);
       localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify({
-        id: data.id,
-        nome: data.nome,
-        email: data.email
-      }));
+      localStorage.setItem('user', JSON.stringify(userData));
 
       toast.success(`Bem-vindo, ${data.nome}!`);
       return true;
@@ -57,18 +53,15 @@ export const AuthProvider = ({ children }) => {
     try {
       const data = await authApi.cadastro(nome, email, senha);
       
-      setUser({
+      const userData = {
         id: data.id,
         nome: data.nome,
         email: data.email
-      });
+      };
       
+      setUser(userData);
       localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify({
-        id: data.id,
-        nome: data.nome,
-        email: data.email
-      }));
+      localStorage.setItem('user', JSON.stringify(userData));
 
       toast.success('Cadastro realizado com sucesso!');
       return true;
