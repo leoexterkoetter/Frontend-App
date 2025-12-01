@@ -4,7 +4,7 @@ import {
   MAX_VALOR, 
   formatCurrencyInput 
 } from '../utils/formatters.js';
-
+import { useAuth } from '../context/AuthContext';
 import React, { useState, useEffect, useMemo } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 
@@ -30,7 +30,6 @@ import {
 
 // ✔ Correção do services
 import { exportarPDF } from '../services/pdfExport.js';
-
 
 
 const API_URL = 'https://finance-backend-production-8578.up.railway.app';
