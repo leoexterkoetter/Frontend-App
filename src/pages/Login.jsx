@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { LogIn, UserPlus } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
-const API_URL = 'https://finance-backend-production-8578.up.railway.app';
-
-const Login = ({ onLogin }) => {
+const Login = () => {
+  const navigate = useNavigate();
+  const { login, cadastro } = useAuth();
   const [modo, setModo] = useState('login');
   const [form, setForm] = useState({ email: '', senha: '', nome: '' });
   const [erro, setErro] = useState('');
@@ -15,49 +17,13 @@ const Login = ({ onLogin }) => {
     setCarregando(true);
 
     try {
-      const endpoint = modo === 'login' ? '/api/login' : '/api/cadastro';
-
-      const response = await fetch(`${API_URL}${endpoint}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form)
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Erro ao processar requisição');
+      if (modo === 'login') {
+        const success = await login(form.email, form.senha);
+        if (success) navigate('/');
+      } else {
+        const success = await cadastro(form.nome, form.email, form.senha);
+        if (success) navigate('/');
       }
-
-      // ✅ CADASTRO
-      if (modo === 'cadastro') {
-        alert('Cadastro realizado com sucesso! Faça login.');
-        setModo('login');
-        setForm({ email: form.email, senha: '', nome: '' });
-        return;
-      }
-
-      // ✅ LOGIN (JWT)
-      localStorage.setItem('token', data.token);
-      localStorage.setItem(
-        'usuario',
-        JSON.stringify({
-          id: data.id,
-          nome: data.nome,
-          email: data.email
-        })
-      );
-
-     onLogin({
-  token: data.token,
-  usuario: {
-    id: data.id,
-    nome: data.nome,
-    email: data.email
-  }
-});
-
-
     } catch (error) {
       setErro(error.message || 'Erro ao conectar com servidor');
     } finally {
