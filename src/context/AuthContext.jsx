@@ -29,12 +29,22 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, senha) => {
     try {
       const data = await authApi.login(email, senha);
+          console.log("🔍 RESPOSTA DO BACKEND LOGIN:", data); // <-- ADICIONE AQUI
+
       
-      const userData = {
-        id: data.id,
-        nome: data.nome,
-        email: data.email
-      };
+     // Ajusta automaticamente conforme o backend retorna
+const userData = {
+  id: data.id || data.user?.id || data.usuario?.id,
+  nome: data.nome || data.user?.nome || data.usuario?.nome,
+  email: data.email || data.user?.email || data.usuario?.email,
+};
+
+if (!userData.id) {
+  console.error("ERRO: Backend não enviou ID do usuário", data);
+  toast.error("Erro: resposta inválida do servidor");
+  return false;
+}
+
       
       setUser(userData);
       localStorage.setItem('token', data.token);
