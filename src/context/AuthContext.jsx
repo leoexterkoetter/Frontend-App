@@ -16,6 +16,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Carrega usuário salvo no navegador
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     const storedToken = localStorage.getItem('token');
@@ -23,35 +24,38 @@ export const AuthProvider = ({ children }) => {
     if (storedUser && storedToken) {
       setUser(JSON.parse(storedUser));
     }
+
     setLoading(false);
   }, []);
 
+  // LOGIN
   const login = async (email, senha) => {
     try {
       const data = await authApi.login(email, senha);
-          console.log("🔍 RESPOSTA DO BACKEND LOGIN:", data); // <-- ADICIONE AQUI
+      console.log("🔍 RESPOSTA DO BACKEND LOGIN:", data);
 
-      
-     // Ajusta automaticamente conforme o backend retorna
-const userData = {
-  id: data.id || data.user?.id || data.usuario?.id,
-  nome: data.nome || data.user?.nome || data.usuario?.nome,
-  email: data.email || data.user?.email || data.usuario?.email,
-};
+      // Aceita vários formatos de backend
+      const userData = {
+        id: data.id || data.user?.id || data.usuario?.id,
+        nome: data.nome || data.user?.nome || data.usuario?.nome,
+        email: data.email || data.user?.email || data.usuario?.email,
+      };
 
-if (!userData.id) {
-  console.error("ERRO: Backend não enviou ID do usuário", data);
-  toast.error("Erro: resposta inválida do servidor");
-  return false;
-}
+      // Segurança: se o back não mandar ID → erro
+      if (!userData.id) {
+        console.error("❌ ERRO: Backend não enviou ID válido:", data);
+        toast.error("Erro inesperado: resposta inválida do servidor.");
+        return false;
+      }
 
-      
+      // Salva estado e localStorage
       setUser(userData);
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(userData));
 
-      toast.success(`Bem-vindo, ${data.nome}!`);
+      toast.success(`Bem-vindo, ${userData.nome}!`);
       return true;
+
     } catch (error) {
       const message = error.response?.data?.error || 'Erro ao fazer login';
       toast.error(message);
@@ -59,22 +63,24 @@ if (!userData.id) {
     }
   };
 
+  // CADASTRO
   const cadastro = async (nome, email, senha) => {
     try {
       const data = await authApi.cadastro(nome, email, senha);
-      
+
       const userData = {
         id: data.id,
         nome: data.nome,
         email: data.email
       };
-      
+
       setUser(userData);
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(userData));
 
       toast.success('Cadastro realizado com sucesso!');
       return true;
+
     } catch (error) {
       const message = error.response?.data?.error || 'Erro ao cadastrar';
       toast.error(message);
@@ -82,12 +88,22 @@ if (!userData.id) {
     }
   };
 
+  // LOGOUT
   const logout = () => {
     setUser(null);
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     toast.success('Logout realizado');
   };
+
+  // ⚠️ Proteção contra renderização antes de carregar user
+  if (loading) {
+    return (
+      <div className="text-white w-full h-screen flex items-center justify-center">
+        Carregando...
+      </div>
+    );
+  }
 
   return (
     <AuthContext.Provider value={{ user, loading, login, cadastro, logout }}>
