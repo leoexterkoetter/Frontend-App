@@ -125,7 +125,18 @@ const CATEGORIAS_PADRAO = {
 };
 
 const FinanceApp = () => {
-  const { user: usuario, logout: onLogout } = useAuth();
+  const { user, logout } = useAuth();
+  const usuario = user;
+  const onLogout = logout;
+  // Proteção contra undefined
+  if (!usuario) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
   const [tela, setTela] = useState('dashboard');
   const [modalRapido, setModalRapido] = useState(false);
   const [modalCaixinha, setModalCaixinha] = useState(false);
